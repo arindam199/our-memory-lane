@@ -1,0 +1,14 @@
+{
+  "name": "our-memory-lane",
+  "version": "1.0.0",
+  "description": "Romantic website for Anvesha",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-all-features.js"
+  },
+  "author": "Arindam",
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer": "^25.14.0"
+  }
+}

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="pink">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Our Memory Lane 📸 — For Anvesha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261019_06">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
+</head>
+<body>
+
+  <!-- Floating Sparkles & Hearts Canvas -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- Background Music Player Widget -->
+  <div class="music-floating-widget" id="musicWidget">
+    <div class="music-disc-wrapper" id="musicToggleBtn" onclick="toggleMusicPlay()" title="Click to play / pause romantic melody">
+      <div class="vinyl-disc" id="vinylDisc">
+        <div class="disc-groove"></div>
+        <div class="disc-label" id="discEmoji">🌸</div>
+      </div>
+      <div class="music-pulse-waves">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="music-info-pill">
+      <div class="music-track-title-row">
+        <span class="music-track-title" id="musicTrackName">Romantic Lofi Harp 🎶</span>
+      </div>
+      <div class="music-controls-row">
+        <button type="button" class="music-mini-btn" id="prevTrackBtn" onclick="prevMusicTrack(event)" title="Previous song">⏮️</button>
+        <button type="button" class="music-mini-btn music-play-btn" id="playPauseMusicBtn" onclick="toggleMusicPlay(event)" title="Play or Pause">▶️</button>
+        <button type="button" class="music-mini-btn" id="nextTrackBtn" onclick="nextMusicTrack(event)" title="Next song">⏭️</button>
+        <span class="music-status-badge" id="musicStatus">Tap to play</span>
+      </div>
+    </div>
+  </div>
+  <audio id="bgAudio" preload="auto"></audio>
+
+  <!-- Navigation Bar & Theme Picker -->
+  <header class="top-nav">
+    <div class="nav-brand">
+      <span class="brand-heart">📸</span>
+      <span class="brand-title">Our Memory Lane</span>
+      <span class="dedicated-badge">For Anvesha 💖</span>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Aesthetic Theme Switcher -->
+      <div class="theme-picker-container">
+        <label for="themeSelect" class="theme-label">Aesthetic:</label>
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="pink" title="Pink Pinterest Soft & Cute">
+            🎀 Soft Pink
+          </button>
+          <button class="theme-btn" data-theme="galaxy" title="Dreamy Galaxy with Glowing Hearts">
+            🌌 Galaxy
+          </button>
+          <button class="theme-btn" data-theme="minimal" title="Minimal, Elegant & Premium">
+            🤍 Minimal
+          </button>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#story">Our Story</a>
+        <a href="#gallery">Memories</a>
+        <a href="#jokes">Inside Jokes</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#letters">Love Letters</a>
+        <a href="#bucketlist">Bucket List</a>
+        <a href="#surprise" class="nav-surprise-btn">Final Surprise 🎁</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-decorations">
+      <div class="washi-tape washi-top-left"></div>
+      <div class="washi-tape washi-top-right"></div>
+      <div class="floating-sticker sticker-1">✨</div>
+      <div class="floating-sticker sticker-2">🧸</div>
+      <div class="floating-sticker sticker-3">💌</div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-tag">A Digital Scrapbook of Us</div>
+
+      <!-- Couple Hero Badge -->
+      <div class="couple-hero-badge">
+        <div class="avatar-wrapper avatar-arindam">
+          <img src="assets/images/arindam.jpg" alt="Arindam" class="avatar-img-circle">
+          <span class="avatar-tag">Arindam</span>
+        </div>
+        <div class="couple-heart-connector">
+          <span class="heart-pulse-icon">💖</span>
+          <span class="heart-subtext">Forever</span>
+        </div>
+        <div class="avatar-wrapper avatar-anvesha">
+          <img src="assets/images/anvesha.jpg" alt="Anvesha" class="avatar-img-circle">
+          <span class="avatar-tag">Anvesha</span>
+        </div>
+      </div>
+
+      <h1 class="hero-heading">
+        Every moment with you,<br>
+        <span class="highlight-name">Anvesha</span>, is my favorite.
+      </h1>
+      <p class="hero-subtitle">
+        From our awkward first hellos to midnight giggles and endless inside jokes.
+        Here is a little home for all our sweetest memories, captured forever in time.
+      </p>
+
+      <!-- Love Counter / Days Together Counter -->
+      <div class="love-counter-card">
+        <div class="counter-header">
+          <span class="pulse-dot"></span>
+          <span>We've been loving each other for</span>
+        </div>
+        <div class="counter-grid">
+          <div class="counter-box">
+            <span class="count-num" id="daysCount">520</span>
+            <span class="count-label">Days</span>
+          </div>
+          <div class="counter-box">
+            <span class="count-num" id="hoursCount">12</span>
+            <span class="count-label">Hours</span>
+          </div>
+          <div class="counter-box">
+            <span class="count-num" id="minutesCount">48</span>
+            <span class="count-label">Minutes</span>
+          </div>
+          <div class="counter-box">
+            <span class="count-num" id="secondsCount">20</span>
+            <span class="count-label">Seconds</span>
+          </div>
+        </div>
+        <div class="counter-date-pick">
+          <label for="anniversaryInput">Our Special Date:</label>
+          <input type="date" id="anniversaryInput" value="2024-04-22">
+          <span class="edit-hint">(22 April 2024 💖)</span>
+        </div>
+      </div>
+
+      <div class="hero-cta-group">
+        <a href="#story" class="btn btn-primary">Begin Our Journey 📖</a>
+        <button class="btn btn-outline" id="playMusicHeroBtn">Play Romantic Vibe 🎵</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: The Story of How We Met -->
+  <section class="section-container" id="story">
+    <div class="section-badge">Chapter 01</div>
+    <h2 class="section-title">The Story of How We Met 📖</h2>
+    <p class="section-subtitle">The universe conspired, and out of 8 billion people, I found you.</p>
+
+    <div class="story-booklet">
+      <div class="scrapbook-pin pin-left"></div>
+      <div class="scrapbook-pin pin-right"></div>
+
+      <!-- Couple Profile Showcase -->
+      <div class="couple-showcase-row">
+        <div class="couple-profile-card">
+          <img src="assets/images/arindam.jpg" alt="Arindam" class="profile-card-photo">
+          <div class="profile-card-info">
+            <h4>Arindam</h4>
+            <span class="profile-card-role">The Guy in Love 🌟</span>
+            <p class="profile-card-bio">"The moment she smiled at me, I knew my heart was hers forever."</p>
+          </div>
+        </div>
+        <div class="couple-profile-card">
+          <img src="assets/images/anvesha.jpg" alt="Anvesha" class="profile-card-photo">
+          <div class="profile-card-info">
+            <h4>Anvesha</h4>
+            <span class="profile-card-role">The Girl Who Stole His Heart 🌸</span>
+            <p class="profile-card-bio">"Her laugh, her warmth, and her eyes made my whole world come alive."</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-grid">
+        <div class="story-card chapter-card">
+          <div class="chapter-number">I</div>
+          <h3 class="chapter-title">The First Glance ✨</h3>
+          <p class="chapter-text" contenteditable="true" id="storyPart1">
+            "It all started unexpectedly. That day felt like any other regular afternoon, until you walked into the room.
+            The smile you had, the way you laughed — suddenly everything else blurred into background noise.
+            I remember thinking to myself: <em>who is this girl, and why is my heart racing?</em>"
+          </p>
+          <span class="card-edit-badge">✏️ Click to personalize</span>
+        </div>
+
+        <div class="story-card chapter-card">
+          <div class="chapter-number">II</div>
+          <h3 class="chapter-title">The First Conversation 💬</h3>
+          <p class="chapter-text" contenteditable="true" id="storyPart2">
+            "We started talking about the most random things — our favorite songs, silly childhood habits, and dreams we never told anyone.
+            What was supposed to be a five-minute chat turned into hours. Time disappeared, and for the first time, conversation felt like coming home."
+          </p>
+          <span class="card-edit-badge">✏️ Click to personalize</span>
+        </div>
+
+        <div class="story-card chapter-card highlight-chapter">
+          <div class="chapter-number">III</div>
+          <h3 class="chapter-title">The Moment I Knew 💖</h3>
+          <p class="chapter-text" contenteditable="true" id="storyPart3">
+            "It wasn't just fireworks; it was the quiet comfort. Watching you get excited over tiny little things, the warmth in your voice when you say my name, and the way you look at me. That was the day I knew: <strong>Anvesha, you are the one.</strong>"
+          </p>
+          <span class="card-edit-badge">✏️ Click to personalize</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Favorite Pictures Together (Interactive Polaroid Scrapbook) -->
+  <section class="section-container" id="gallery">
+    <div class="section-badge">Chapter 02</div>
+    <h2 class="section-title">Our Favorite Pictures Together 📸</h2>
+    <p class="section-subtitle">
+      Pinned with love. Click any polaroid to flip and read handwritten memories, or upload your own favorite snaps!
+    </p>
+
+    <!-- Polaroid Upload & Reset Controls -->
+    <div class="gallery-controls">
+      <label for="photoUploadInput" class="btn btn-sm btn-primary upload-btn">
+        <span>📸 Add New Polaroid</span>
+        <input type="file" id="photoUploadInput" accept="image/*" multiple style="display:none">
+      </label>
+      <span class="controls-hint">💡 Tip: Click any photo to flip or view full size! You can also edit captions directly.</span>
+    </div>
+
+    <!-- Polaroids Grid -->
+    <div class="polaroid-scrapbook" id="polaroidScrapbook">
+      <!-- Polaroid 1: Couple Kiss -->
+      <div class="polaroid-wrapper tilt-left" data-id="1" onclick="flipPolaroidCard(this, event)">
+        <div class="polaroid-tape"></div>
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
+              <img src="assets/images/couple_kiss.jpg" alt="Arindam and Anvesha" class="polaroid-img">
+              <span class="zoom-icon">🔍</span>
+            </div>
+            <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">
+              Kiss on your cheek, forever in my heart 💋
+            </div>
+            <div class="polaroid-date">Sweetest Moments</div>
+          </div>
+          <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
+            <div class="handwritten-note">
+              <h4>Behind this photo 💕</h4>
+              <p contenteditable="true" onclick="event.stopPropagation()">
+                I love how you scrunch up your nose when I kiss your cheek. Every time I hold you close like this, the entire chaotic world outside just fades into silence. You are my peaceful sanctuary, Anvesha.
+              </p>
+              <div class="doodle-heart">〜 (˘ ³˘)♥ Arindam</div>
+            </div>
+          </div>
+        </div>
+        <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
+      </div>
+
+      <!-- Polaroid 2: Couple Selfie -->
+      <div class="polaroid-wrapper tilt-right" data-id="2" onclick="flipPolaroidCard(this, event)">
+        <div class="polaroid-tape tape-pink"></div>
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
+              <img src="assets/images/couple_selfie.jpg" alt="Night selfie together" class="polaroid-img">
+              <span class="zoom-icon">🔍</span>
+            </div>
+            <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">
+              Late night rides & endless laughter 🛺✨
+            </div>
+            <div class="polaroid-date">Unfiltered Smiles</div>
+          </div>
+          <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
+            <div class="handwritten-note">
+              <h4>Behind this photo 💕</h4>
+              <p contenteditable="true" onclick="event.stopPropagation()">
+                Sitting right beside you, feeling the cool night breeze, hearing you laugh at my silly jokes. There is nowhere else in the universe I would rather be than in this seat, right next to you.
+              </p>
+              <div class="doodle-heart">🧸 favorite ride</div>
+            </div>
+          </div>
+        </div>
+        <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
+      </div>
+
+      <!-- Polaroid 3: Anvesha -->
+      <div class="polaroid-wrapper tilt-slight" data-id="3" onclick="flipPolaroidCard(this, event)">
+        <div class="polaroid-tape tape-glitter"></div>
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
+              <img src="assets/images/anvesha.jpg" alt="Anvesha" class="polaroid-img">
+              <span class="zoom-icon">🔍</span>
+            </div>
+            <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">
+              My breathtaking girl, Anvesha 🌸
+            </div>
+            <div class="polaroid-date">Pure Elegance</div>
+          </div>
+          <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
+            <div class="handwritten-note">
+              <h4>Behind this photo 💕</h4>
+              <p contenteditable="true" onclick="event.stopPropagation()">
+                Just look at you! That gentle smile, your bright eyes, the effortless grace you carry wherever you go. You light up every room you step into, and you make my world infinitely brighter.
+              </p>
+              <div class="doodle-heart">👑 My Queen</div>
+            </div>
+          </div>
+        </div>
+        <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
+      </div>
+
+      <!-- Polaroid 4: Arindam -->
+      <div class="polaroid-wrapper tilt-left" data-id="4" onclick="flipPolaroidCard(this, event)">
+        <div class="polaroid-tape"></div>
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
+              <img src="assets/images/arindam.jpg" alt="Arindam" class="polaroid-img">
+              <span class="zoom-icon">🔍</span>
+            </div>
+            <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">
+              Lost in the crowd, eyes only for you 🎶
+            </div>
+            <div class="polaroid-date">Festival Nights</div>
+          </div>
+          <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
+            <div class="handwritten-note">
+              <h4>Behind this photo 💕</h4>
+              <p contenteditable="true" onclick="event.stopPropagation()">
+                Even in a crowded venue with music booming and lights flashing, my thoughts and my eyes always wander back to you. Everything is better when shared with you.
+              </p>
+              <div class="doodle-heart">✨ Thinking of you</div>
+            </div>
+          </div>
+        </div>
+        <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
+      </div>
+
+      <!-- Polaroid 5: Couple Cuddle -->
+      <div class="polaroid-wrapper tilt-right" data-id="5" onclick="flipPolaroidCard(this, event)">
+        <div class="polaroid-tape tape-pink"></div>
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
+              <img src="assets/images/couple_cuddle.jpg" alt="Couple cuddle" class="polaroid-img">
+              <span class="zoom-icon">🔍</span>
+            </div>
+            <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">
+              Warmest hugs & safest place 🫂❤️
+            </div>
+            <div class="polaroid-date">Forever Safe</div>
+          </div>
+          <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
+            <div class="handwritten-note">
+              <h4>Behind this photo 💕</h4>
+              <p contenteditable="true" onclick="event.stopPropagation()">
+                My favorite spot in the whole world will always be wrapped right around you. Whenever life gets overwhelming, holding you is the only remedy I ever need.
+              </p>
+              <div class="doodle-heart">♾️ Forever & Always</div>
+            </div>
+          </div>
+        </div>
+        <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Funniest Conversations & Inside Jokes -->
+  <section class="section-container" id="jokes">
+    <div class="section-badge">Chapter 03</div>
+    <h2 class="section-title">Funniest Texts & Inside Jokes 🤣</h2>
+    <p class="section-subtitle">
+      Only Anvesha and I will ever truly understand these silly, chaotic, golden moments.
+    </p>
+
+    <div class="jokes-grid">
+      <!-- Chat Bubble Mockup -->
+      <div class="phone-mockup">
+        <div class="phone-header">
+          <img src="assets/images/anvesha.jpg" alt="Anvesha" class="phone-avatar-img">
+          <div class="phone-user-info">
+            <span class="phone-name">Anvesha 💖</span>
+            <span class="phone-status">Online • typing...</span>
+          </div>
+          <div class="phone-icons">📞 📹</div>
+        </div>
+        <div class="chat-thread">
+          <div class="chat-bubble received">
+            <p>Hey, what do you want to eat for dinner?</p>
+            <span class="chat-time">7:14 PM</span>
+          </div>
+          <div class="chat-bubble sent">
+            <p>Anything you want is fine with me! You pick 😊</p>
+            <span class="chat-time">7:15 PM</span>
+          </div>
+          <div class="chat-bubble received">
+            <p>Okay, how about pizza?</p>
+            <span class="chat-time">7:15 PM</span>
+          </div>
+          <div class="chat-bubble sent">
+            <p>No, had pizza yesterday 😅</p>
+            <span class="chat-time">7:16 PM</span>
+          </div>
+          <div class="chat-bubble received">
+            <p>Chinese?</p>
+            <span class="chat-time">7:16 PM</span>
+          </div>
+          <div class="chat-bubble sent">
+            <p>Not feeling noodles today...</p>
+            <span class="chat-time">7:17 PM</span>
+          </div>
+          <div class="chat-bubble received sticker-bubble">
+            <div class="sticker-meme">😤🤜💥</div>
+            <p>"I literally said you pick!!"</p>
+            <span class="chat-time">7:17 PM</span>
+          </div>
+          <div class="chat-bubble sent">
+            <p>Hehe... order both? My treat! 🥺❤️</p>
+            <span class="chat-time">7:18 PM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inside Jokes Cards Deck -->
+      <div class="inside-jokes-deck">
+        <div class="joke-card">
+          <div class="joke-tag">Inside Joke #1</div>
+          <h4 class="joke-title">"I'll be ready in 5 minutes!" ⏰</h4>
+          <p class="joke-desc">
+            Legend says when Anvesha says 5 minutes, it exists in a parallel dimension where minutes last 45 minutes, involving hair curlers, outfit changes, and dancing in front of the mirror.
+          </p>
+          <div class="joke-reaction">
+            <span>Accuracy Rating:</span>
+            <strong>1000% 🎯</strong>
+          </div>
+        </div>
+
+        <div class="joke-card">
+          <div class="joke-tag">Inside Joke #2</div>
+          <h4 class="joke-title">The "I'm Not Hungry" French Fry Tax 🍟</h4>
+          <p class="joke-desc">
+            Rule 1: "I don't need any fries, I'm full."<br>
+            Rule 2: As soon as my food arrives, 60% of my fries mysteriously vanish into Anvesha's tummy.
+          </p>
+          <div class="joke-reaction">
+            <span>Fry Thief Status:</span>
+            <strong>Caught red-handed 🚨</strong>
+          </div>
+        </div>
+
+        <div class="joke-card">
+          <div class="joke-tag">Inside Joke #3</div>
+          <h4 class="joke-title">Midnight Dramatic Debates 🌙</h4>
+          <p class="joke-desc">
+            At 2:30 AM: "If I were a worm in a tiny strawberry house, would you still bring me warm chai and love me?"<br>
+            <em>(Answer: Absolutely, yes, always.)</em>
+          </p>
+          <div class="joke-reaction">
+            <span>Worm Love:</span>
+            <strong>Forever & Always 🪱🍓</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: "Remember This Day?" Interactive Scratch & Reveal -->
+  <section class="section-container" id="remember">
+    <div class="section-badge">Interactive Feature</div>
+    <h2 class="section-title">“Remember this day?” ✨</h2>
+    <p class="section-subtitle">
+      Scratch the heart or click the button to uncover our random treasured memories!
+    </p>
+
+    <div class="mystery-memory-box">
+      <div class="memory-card-revealed" id="memoryRevealCard">
+        <img src="assets/images/couple_cuddle.jpg" alt="Cherished memory" class="revealed-memory-photo" id="mysteryPhoto">
+        <div class="revealed-meta-tags">
+          <span class="revealed-date" id="mysteryDate">That Rainy Sunday Afternoon</span>
+          <span class="revealed-location-tag" id="mysteryLocation">📍 Living Room Fortress</span>
+        </div>
+        <h3 class="revealed-title" id="mysteryTitle">The Blanket Fort Movie Marathon</h3>
+        <p class="revealed-desc" id="mysteryDesc">
+          We built a giant blanket fort with fairy lights in the living room, ate microwave popcorn, and fell asleep halfway through the movie with your hand interlocked in mine.
+        </p>
+        <div class="revealed-extra-notes" id="mysteryExtraNotes">
+          <div class="extra-note-pill">
+            <span class="extra-note-label">Arindam's Heart:</span>
+            <span id="mysteryArindamNote">"I didn't care about the movie at all. I was just staring at your peaceful sleeping face."</span>
+          </div>
+          <div class="extra-note-pill">
+            <span class="extra-note-label">Inside Joke:</span>
+            <span id="mysteryInsideJoke">"We dropped 3 popcorn kernels in the blankets and gave up looking for them."</span>
+          </div>
+        </div>
+        <div class="revealed-card-actions">
+          <button class="btn btn-sm btn-outline" id="shuffleMemoryBtn" onclick="shuffleMemory()">🎲 Pick Another Memory</button>
+          <button class="btn btn-sm btn-primary" id="playMemoryAudioBtn" onclick="playMemoryChime()">🎵 Play Memory Chime</button>
+        </div>
+      </div>
+
+      <div class="scratch-cover" id="scratchCover" onclick="revealSecretMemory()">
+        <div class="scratch-content">
+          <span class="scratch-heart">💌</span>
+          <h3>Secret Memory Hidden Here</h3>
+          <p>Tap anywhere to unveil this special moment!</p>
+          <button class="btn btn-primary" id="revealMemoryBtn" onclick="event.stopPropagation(); revealSecretMemory()">✨ Reveal This Day ✨</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Special Dates & Milestones (Memory Timeline) -->
+  <section class="section-container" id="timeline">
+    <div class="section-badge">Chapter 04</div>
+    <h2 class="section-title">Our Milestone Timeline ⏳</h2>
+    <p class="section-subtitle">The footsteps that brought us to where we are today.</p>
+
+    <div class="timeline-container">
+      <div class="timeline-line"></div>
+
+      <!-- Milestone 1 -->
+      <div class="timeline-item left">
+        <div class="timeline-dot">🌱</div>
+        <div class="timeline-content">
+          <span class="timeline-date">Day One</span>
+          <h3 class="timeline-title">The First Hello</h3>
+          <p class="timeline-body">
+            The moment our paths crossed. Neither of us knew that a simple greeting would become the beginning of our sweetest adventure.
+          </p>
+        </div>
+      </div>
+
+      <!-- Milestone 2 -->
+      <div class="timeline-item right">
+        <div class="timeline-dot">💖</div>
+        <div class="timeline-content">
+          <span class="timeline-date">Official Day</span>
+          <h3 class="timeline-title">"Will You Be My Girlfriend?"</h3>
+          <p class="timeline-body">
+            The day we made it official. Looking into your eyes, feeling the whole world stop, and hearing you say "Yes" was pure euphoria.
+          </p>
+        </div>
+      </div>
+
+      <!-- Milestone 3 -->
+      <div class="timeline-item left">
+        <div class="timeline-dot">✈️</div>
+        <div class="timeline-content">
+          <span class="timeline-date">First Getaway</span>
+          <h3 class="timeline-title">Our First Trip Together</h3>
+          <p class="timeline-body">
+            Singing off-key on the road trip, sharing snacks, getting lost together, and making memories that live rent-free in my heart forever.
+          </p>
+        </div>
+      </div>
+
+      <!-- Milestone 4 -->
+      <div class="timeline-item right">
+        <div class="timeline-dot">🎂</div>
+        <div class="timeline-content">
+          <span class="timeline-date">Milestone</span>
+          <h3 class="timeline-title">Celebrating You</h3>
+          <p class="timeline-body">
+            Seeing that pure childish joy on your face when you blew out the candles. My only birthday wish was to see you smile like that every day.
+          </p>
+        </div>
+      </div>
+
+      <!-- Milestone 5 -->
+      <div class="timeline-item left">
+        <div class="timeline-dot">♾️</div>
+        <div class="timeline-content">
+          <span class="timeline-date">Today & Beyond</span>
+          <h3 class="timeline-title">Still Falling for You</h3>
+          <p class="timeline-body">
+            Every morning I wake up grateful for Anvesha. The best chapters of our story are still waiting to be written.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: Love Letters (Interactive Envelopes) -->
+  <section class="section-container" id="letters">
+    <div class="section-badge">Chapter 05</div>
+    <h2 class="section-title">Love Letters for Anvesha 💌</h2>
+    <p class="section-subtitle">
+      Sealed with wax. Click any envelope to break the seal and open my heart to you.
+    </p>
+
+    <div class="envelopes-grid" id="envelopesGrid">
+      <!-- Letter 1 -->
+      <div class="envelope-item" data-letter="1" onclick="openLoveLetter(1)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">💖</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Open First</span>
+            <h3>"Why I Love You"</h3>
+            <p class="envelope-sub">A reminder on ordinary days</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(1)">Open Letter 💌</button>
+      </div>
+
+      <!-- Letter 2 -->
+      <div class="envelope-item" data-letter="2" onclick="openLoveLetter(2)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">🧸</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Open When</span>
+            <h3>"When You Miss Me"</h3>
+            <p class="envelope-sub">Wrap this around you like a hug</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(2)">Open Letter 💌</button>
+      </div>
+
+      <!-- Letter 3 -->
+      <div class="envelope-item" data-letter="3" onclick="openLoveLetter(3)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">🌟</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Open When</span>
+            <h3>"When You Need A Smile"</h3>
+            <p class="envelope-sub">For tiring or stressful days</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(3)">Open Letter 💌</button>
+      </div>
+
+      <!-- Letter 4 -->
+      <div class="envelope-item" data-letter="4" onclick="openLoveLetter(4)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">🥂</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Special Milestone</span>
+            <h3>"On Our Anniversary"</h3>
+            <p class="envelope-sub">A toast to our love story</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(4)">Open Letter 💌</button>
+      </div>
+
+      <!-- Letter 5 -->
+      <div class="envelope-item" data-letter="5" onclick="openLoveLetter(5)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">🌙</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Midnight Note</span>
+            <h3>"When You Can't Sleep"</h3>
+            <p class="envelope-sub">Warm thoughts & sweet dreams</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(5)">Open Letter 💌</button>
+      </div>
+
+      <!-- Letter 6 -->
+      <div class="envelope-item" data-letter="6" onclick="openLoveLetter(6)">
+        <div class="envelope-card">
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">🤝</div>
+          <div class="envelope-front">
+            <span class="envelope-tag">Read With Love</span>
+            <h3>"If We Ever Fight"</h3>
+            <p class="envelope-sub">You & me against the problem</p>
+          </div>
+        </div>
+        <button class="open-letter-trigger" onclick="event.stopPropagation(); openLoveLetter(6)">Open Letter 💌</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: Future Bucket List -->
+  <section class="section-container" id="bucketlist">
+    <div class="section-badge">Chapter 06</div>
+    <h2 class="section-title">Our Future Bucket List ✈️🗺️</h2>
+    <p class="section-subtitle">
+      All the wild, cozy, and dreamy adventures waiting for us. Check them off as we conquer them together!
+    </p>
+
+    <div class="bucketlist-board">
+      <div class="bucket-progress-wrapper">
+        <div class="progress-info">
+          <span>Our Adventures Completed:</span>
+          <span id="bucketProgressText">2 of 8 Completed</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="bucketProgressBar" style="width: 25%;"></div>
+        </div>
+      </div>
+
+      <div class="bucket-items-list" id="bucketListItems">
+        <!-- Item 1 -->
+        <label class="bucket-checkbox-item checked">
+          <input type="checkbox" checked data-id="b1" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Watch the sunset from a quiet hill picnic 🌅</span>
+          <span class="bucket-badge">Done! 🎉</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 2 -->
+        <label class="bucket-checkbox-item checked">
+          <input type="checkbox" checked data-id="b2" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Sing our hearts out on a late-night drive 🚗🎶</span>
+          <span class="bucket-badge">Done! 🎉</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 3 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b3" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Chase the Northern Lights (Aurora Borealis) together in Norway 🌌</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 4 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b4" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Cook a gourmet 3-course dinner together without setting off the smoke alarm 🍝</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 5 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b5" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Adopt a golden retriever puppy and spoil it rotten 🐶</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 6 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b6" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Go stargazing in a glass igloo surrounded by snow ❄️</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 7 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b7" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Get matching silly pajamas for Christmas morning 🎄</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+        <!-- Item 8 -->
+        <label class="bucket-checkbox-item">
+          <input type="checkbox" data-id="b8" onchange="toggleBucketItem(this)">
+          <span class="custom-checkmark"></span>
+          <span class="bucket-text">Build our cozy dream home with a sunny reading corner 🏡</span>
+          <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+        </label>
+      </div>
+
+      <!-- Add New Bucket Item -->
+      <form class="add-bucket-form" id="addBucketForm" onsubmit="addBucketAdventure(event)">
+        <input type="text" id="newBucketInput" placeholder="Add our next dream adventure..." required>
+        <button type="submit" class="btn btn-primary">Add Adventure ✨</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Section 8: The Final Surprise Vault -->
+  <section class="section-container final-surprise-section" id="surprise">
+    <div class="surprise-glow"></div>
+    <div class="section-badge">The Final Chapter</div>
+    <h2 class="section-title">A Little Secret Just For You 🎁</h2>
+    <p class="section-subtitle">
+      You've scrolled through our sweetest memories, Anvesha. But there's one last secret locked away...
+    </p>
+
+    <!-- Locked Mystery Vault Box -->
+    <div class="vault-container" id="vaultContainer">
+      <div class="vault-box" id="vaultBox" onclick="openVaultModal()">
+        <div class="vault-lock-icon">🔒</div>
+        <h3 class="vault-title">Top Secret Heart Vault</h3>
+        <p class="vault-instructions">
+          Only Anvesha holds the key to this final surprise. Tap anywhere to unlock!
+        </p>
+        <button class="btn btn-primary btn-pulse" id="unlockVaultBtn" onclick="event.stopPropagation(); openVaultModal()">
+          🔓 Unlock Our Secret 💌
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Revealed Secret Card (Hidden initially) -->
+  <div class="secret-reveal-modal" id="secretModal">
+      <div class="secret-backdrop" onclick="closeVaultModal()"></div>
+      <div class="secret-card-content">
+        <button class="secret-close-btn" id="closeSecretBtn" onclick="closeVaultModal()">✕</button>
+
+        <div class="surprise-sparkle-header">
+          <span class="surprise-crown">👑</span>
+          <h2>Dearest Anvesha,</h2>
+          <span class="surprise-tag">My Forever Favorite Person</span>
+        </div>
+
+        <!-- Centerpiece Photo Frame -->
+        <div class="centerpiece-frame-wrapper">
+          <div class="frame-tape"></div>
+          <div class="centerpiece-frame">
+            <img id="finalCenterpiecePhoto" src="assets/images/couple_kiss.jpg" alt="Arindam and Anvesha">
+            <div class="photo-overlay-badge">Arindam & Anvesha Forever 💖</div>
+          </div>
+          <div class="frame-actions">
+            <label for="replaceCenterpieceInput" class="custom-file-label">
+              <span>🖼️ Upload Another Photo</span>
+              <input type="file" id="replaceCenterpieceInput" accept="image/*" style="display:none">
+            </label>
+          </div>
+        </div>
+
+        <!-- Openable Top Secret Envelope -->
+        <div class="top-secret-envelope" id="topSecretEnvelope" onclick="openTopSecretEnvelope()" title="Tap to open the final letter">
+          <div class="secret-wax-seal">💌</div>
+          <h3>Top Secret: For Anvesha's Eyes Only 👑</h3>
+          <p class="tap-open-hint">✨ Tap this golden envelope to break the seal & unfold the letter ✨</p>
+        </div>
+
+        <!-- The Final Love Letter (Unfolds on click) -->
+        <div class="unfolded-secret-letter" id="unfoldedSecretLetter">
+          <div class="final-love-letter">
+            <div class="letter-seal-decor">💌 Final Love Letter • From Arindam to Anvesha</div>
+            <p class="final-letter-body" contenteditable="true" id="finalLetterText">
+              "Anvesha,<br><br>
+              If you ever wonder how much you mean to me, look up at the night sky and try counting the stars. That's only a fraction of how much love I hold for you in my chest.<br><br>
+              Thank you for being my peace after chaotic days, my biggest cheerleader, the reason I laugh so hard I can't breathe, and my favorite hello.<br><br>
+              Whatever tomorrow brings, good days or challenging ones, I want to experience every single one holding your hand. You are my home, my present, and all my tomorrows.<br><br>
+              I love you endlessly, today and always. ❤️"
+            </p>
+            <div class="letter-signature">
+              <p>Yours forever & always,</p>
+              <div class="signature-line">Arindam ♾️</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Inside Top Secret: Vault of Secret Promises -->
+        <div class="vault-secret-promises-section">
+          <div class="vault-promises-header">
+            <h4>Our Vault of Secret Promises 🗝️</h4>
+            <span class="edit-hint">(Tap any secret card to open & read)</span>
+          </div>
+          <div class="secret-promises-grid" id="secretPromisesGrid">
+            <div class="secret-promise-card" data-promise="1" onclick="toggleSecretPromise(this)">
+              <div class="promise-seal-icon">🔒</div>
+              <div class="promise-card-title">Secret Promise #1</div>
+              <div class="promise-card-preview">Tap to unlock promise...</div>
+              <div class="promise-card-content">
+                "I promise to always make you chai when you're stressed, hold your hand in crowded rooms, and never stop reminding you how gorgeous you are."
+              </div>
+            </div>
+            <div class="secret-promise-card" data-promise="2" onclick="toggleSecretPromise(this)">
+              <div class="promise-seal-icon">🔒</div>
+              <div class="promise-card-title">Secret Promise #2</div>
+              <div class="promise-card-preview">Tap to unlock promise...</div>
+              <div class="promise-card-content">
+                "I promise that no matter how many years go by, I will always look at you with the exact same butterflies as the first day I fell for you."
+              </div>
+            </div>
+            <div class="secret-promise-card" data-promise="3" onclick="toggleSecretPromise(this)">
+              <div class="promise-seal-icon">🔒</div>
+              <div class="promise-card-title">Secret Promise #3</div>
+              <div class="promise-card-preview">Tap to unlock promise...</div>
+              <div class="promise-card-content">
+                "I promise to listen even when you don't say a word, and to be your safest place to land every single day."
+              </div>
+            </div>
+          </div>
+
+          <form class="add-secret-promise-form" id="addSecretPromiseForm" onsubmit="addSecretPromise(event)">
+            <input type="text" id="newSecretPromiseInput" placeholder="Add a new secret promise to our vault..." required>
+            <button type="submit" class="btn btn-primary btn-sm">Add Inside Vault 🗝️</button>
+          </form>
+        </div>
+
+        <!-- Romantic Fireworks / Heart Burst Buttons -->
+        <div class="surprise-footer-actions">
+          <button class="btn btn-primary" id="burstHeartsBtn" onclick="triggerGrandFinale()">Send Her A Shower of Hearts 💖</button>
+          <button class="btn btn-outline" id="printScrapbookBtn" onclick="window.print()">🖨️ Save as Keepsake PDF</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- Letter Modal (For reading the Love Letters) -->
+  <div class="letter-modal" id="letterModal">
+    <div class="letter-modal-backdrop" id="letterBackdrop" onclick="closeLoveLetter()"></div>
+    <div class="letter-modal-paper">
+      <button class="letter-close-btn" id="closeLetterModal" onclick="closeLoveLetter()">✕</button>
+      <div class="letter-stationery">
+        <div class="letter-postmark">AIR MAIL • SPECIAL DELIVERY 🌸</div>
+        <h2 id="modalLetterTitle">Letter Title</h2>
+        <div class="letter-date" id="modalLetterDate">With Love</div>
+        <div class="letter-divider"></div>
+        <div class="letter-modal-body" id="modalLetterBody" contenteditable="true">
+          Letter content goes here...
+        </div>
+        <div class="letter-modal-sign">
+          <p>Forever Yours,</p>
+          <span class="sign-handwritten">Arindam 💖</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Photo Lightbox -->
+  <div class="lightbox-modal" id="lightboxModal">
+    <div class="lightbox-backdrop" onclick="closePhotoLightbox()"></div>
+    <div class="lightbox-box">
+      <button class="lightbox-close-btn" id="closeLightboxBtn" onclick="closePhotoLightbox()">✕</button>
+      <img src="" alt="Enlarged memory" id="lightboxImg">
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-heart">💖</div>
+    <p>Crafted with endless love for <strong>Anvesha</strong></p>
+    <p class="footer-small">Our Memory Lane • Every moment captured in time</p>
+    <div class="footer-back-to-top">
+      <a href="#hero">Back to Top ↑</a>
+    </div>
+  </footer>
+
+  <!-- Confetti Canvas for Grand Finale -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <script src="script.js?v=20261019_06"></script>
+</body>
+</html>
