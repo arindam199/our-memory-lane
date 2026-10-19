@@ -559,6 +559,24 @@ const memoriesPool = [
     desc: "Surrounded by music, flashing stage lights, and cheering crowds, but all I could think about was wishing you were right next to me dancing under the lights.",
     arindamNote: "Every love song that played had your name written all over it.",
     insideJoke: "I sent you a voice note screaming the chorus completely off-key."
+  },
+  {
+    photo: "assets/images/couple_love_you.jpg",
+    date: "Dinner Date & Bright Smiles",
+    location: "📍 Our Favorite Table",
+    title: "Cutest Smile Across the Table",
+    desc: "Sitting across from you in your pretty pink top, watching your eyes sparkle as you rested your cheek in your hand and smiled that smile that melts my heart every single time.",
+    arindamNote: "I could spend an eternity just looking at you smiling like that.",
+    insideJoke: "'Love you <3' written on our hearts forever."
+  },
+  {
+    photo: "assets/images/couple_cozy_mood.jpg",
+    date: "Late Night Cozy Whispers",
+    location: "📍 Right Next to You",
+    title: "Our Peaceful Sanctuary",
+    desc: "Quiet hours, soft lighting, and your gentle hand on my cheek. No words needed—just feeling safe, peaceful, and endlessly grateful that I get to call you mine.",
+    arindamNote: "Holding you close in the quiet is my absolute favorite feeling in the world.",
+    insideJoke: "The ultimate mood: simply being together."
   }
 ];
 
