@@ -1,0 +1,56 @@
+{
+  "polaroids": [],
+  "editedExistingPolaroids": {},
+  "stories": {},
+  "bucketList": [
+    {
+      "text": "Sing our hearts out on a late-night drive 🚗🎶",
+      "checked": true
+    },
+    {
+      "text": "Chase the Northern Lights (Aurora Borealis) together in Norway 🌌",
+      "checked": true
+    },
+    {
+      "text": "Cook a gourmet 3-course dinner together without setting off the smoke alarm 🍝",
+      "checked": false
+    },
+    {
+      "text": "Adopt a golden retriever puppy and spoil it rotten 🐶",
+      "checked": false
+    },
+    {
+      "text": "Go stargazing in a glass igloo surrounded by snow ❄️",
+      "checked": false
+    },
+    {
+      "text": "Get matching silly pajamas for Christmas morning 🎄",
+      "checked": false
+    },
+    {
+      "text": "Build our cozy dream home with a sunny reading corner 🏡",
+      "checked": false
+    },
+    {
+      "text": "Watch a sunrise in Kyoto",
+      "checked": false
+    }
+  ],
+  "promises": [
+    {
+      "content": "\"I promise to always make you chai when you're stressed, hold your hand in crowded rooms, and never stop reminding you how gorgeous you are.\""
+    },
+    {
+      "content": "\"I promise that no matter how many years go by, I will always look at you with the exact same butterflies as the first day I fell for you.\""
+    },
+    {
+      "content": "\"I promise to listen even when you don't say a word, and to be your safest place to land every single day.\""
+    },
+    {
+      "content": "I promise to dance with you in the kitchen at midnight"
+    }
+  ],
+  "centerpiece": null,
+  "anniversary": "2024-04-22",
+  "updatedAt": 1792432796549
+}

@@ -4,6 +4,7 @@
   "description": "Romantic website for Anvesha",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "node test-all-features.js"
   },
   "author": "Arindam",

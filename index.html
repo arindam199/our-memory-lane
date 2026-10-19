@@ -52,6 +52,12 @@
     </div>
 
     <div class="nav-actions">
+      <!-- Memory Vault Auto-save Indicator -->
+      <div class="sync-status-pill" id="syncStatusPill" title="Changes auto-saved to memory vault">
+        <span class="sync-dot"></span>
+        <span class="sync-text">Vault Saved</span>
+      </div>
+
       <!-- Aesthetic Theme Switcher -->
       <div class="theme-picker-container">
         <label for="themeSelect" class="theme-label">Aesthetic:</label>
@@ -234,7 +240,10 @@
         <span>📸 Add New Polaroid</span>
         <input type="file" id="photoUploadInput" accept="image/*" multiple style="display:none">
       </label>
-      <span class="controls-hint">💡 Tip: Click any photo to flip or view full size! You can also edit captions directly.</span>
+      <button type="button" class="btn btn-sm btn-outline-danger" id="resetPolaroidsBtn" onclick="confirmResetMemories()" title="Reset to original photos">
+        <span>🔄 Reset Defaults</span>
+      </button>
+      <span class="controls-hint">💾 <strong>Auto-Saved:</strong> Uploaded photos and edits are permanently saved so they won't reset on refresh!</span>
     </div>
 
     <!-- Polaroids Grid -->

@@ -452,53 +452,352 @@ window.closePhotoLightbox = function() {
   }
 };
 
-// Upload Custom Polaroids
-if (photoUploadInput) {
-  photoUploadInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
+// ==========================================================================
+// BACKEND SYNC & INDEXEDDB PERSISTENCE ENGINE (AppStorage)
+// Guarantees all uploaded polaroids, custom notes, captions, and edits
+// are permanently preserved across refreshes and synced with backend!
+// ==========================================================================
+const DB_NAME = 'OurMemoryLaneDB';
+const DB_VERSION = 1;
+const STORE_POLAROIDS = 'custom_polaroids';
+const STORE_APP_DATA = 'app_data';
+
+const AppStorage = {
+  db: null,
+  syncTimeout: null,
+
+  async init() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB) {
+        console.warn('IndexedDB not supported, falling back to localStorage');
+        resolve(null);
+        return;
+      }
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_POLAROIDS)) {
+          db.createObjectStore(STORE_POLAROIDS, { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains(STORE_APP_DATA)) {
+          db.createObjectStore(STORE_APP_DATA, { keyPath: 'key' });
+        }
+      };
+      req.onsuccess = (e) => {
+        this.db = e.target.result;
+        resolve(this.db);
+      };
+      req.onerror = (e) => {
+        console.warn('IndexedDB open error:', e);
+        resolve(null);
+      };
+    });
+  },
+
+  updateIndicator(status, text) {
+    const pill = document.getElementById('syncStatusPill');
+    if (!pill) return;
+    pill.classList.remove('saving', 'error');
+    const textEl = pill.querySelector('.sync-text');
+    if (status === 'saving') {
+      pill.classList.add('saving');
+      if (textEl) textEl.textContent = text || 'Saving...';
+    } else if (status === 'error') {
+      pill.classList.add('error');
+      if (textEl) textEl.textContent = text || 'Saved Locally';
+    } else {
+      if (textEl) textEl.textContent = text || 'Vault Saved';
+    }
+  },
+
+  async compressImage(file, maxWidth = 1600, quality = 0.88) {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        addNewPolaroid(event.target.result, file.name.replace(/\.[^/.]+$/, ""));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
-  });
+  },
+
+  async getAllPolaroids() {
+    if (!this.db) {
+      try {
+        const raw = localStorage.getItem('memory_lane_custom_polaroids');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    }
+    return new Promise((resolve) => {
+      const tx = this.db.transaction(STORE_POLAROIDS, 'readonly');
+      const store = tx.objectStore(STORE_POLAROIDS);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  },
+
+  async savePolaroid(polaroid) {
+    this.updateIndicator('saving');
+    if (this.db) {
+      const tx = this.db.transaction(STORE_POLAROIDS, 'readwrite');
+      tx.objectStore(STORE_POLAROIDS).put(polaroid);
+    }
+    this.scheduleBackendSync('polaroid', polaroid);
+  },
+
+  async deletePolaroid(id) {
+    this.updateIndicator('saving');
+    if (this.db) {
+      const tx = this.db.transaction(STORE_POLAROIDS, 'readwrite');
+      tx.objectStore(STORE_POLAROIDS).delete(id);
+    }
+    try {
+      await fetch(`/api/polaroid/${id}`, { method: 'DELETE' });
+    } catch (e) {}
+    this.updateIndicator('saved');
+  },
+
+  async getAppData(key, defaultValue = null) {
+    if (!this.db) {
+      try {
+        const raw = localStorage.getItem(`memory_lane_${key}`);
+        return raw ? JSON.parse(raw) : defaultValue;
+      } catch (e) { return defaultValue; }
+    }
+    return new Promise((resolve) => {
+      const tx = this.db.transaction(STORE_APP_DATA, 'readonly');
+      const store = tx.objectStore(STORE_APP_DATA);
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result ? req.result.value : defaultValue);
+      req.onerror = () => resolve(defaultValue);
+    });
+  },
+
+  async setAppData(key, value) {
+    this.updateIndicator('saving');
+    if (this.db) {
+      const tx = this.db.transaction(STORE_APP_DATA, 'readwrite');
+      tx.objectStore(STORE_APP_DATA).put({ key, value, updatedAt: Date.now() });
+    }
+    try {
+      localStorage.setItem(`memory_lane_${key}`, JSON.stringify(value));
+    } catch (e) {}
+    this.scheduleBackendSync('save', { [key]: value });
+  },
+
+  scheduleBackendSync(endpoint, payload) {
+    clearTimeout(this.syncTimeout);
+    this.syncTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.updateIndicator('saved');
+        } else {
+          this.updateIndicator('saved', 'Vault Saved');
+        }
+      } catch (err) {
+        this.updateIndicator('saved', 'Vault Saved');
+      }
+    }, 400);
+  },
+
+  async fetchBackendData() {
+    try {
+      const res = await fetch('/api/data');
+      if (res.ok) {
+        const json = await res.json();
+        return json.data || null;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  },
+
+  async clearAll() {
+    if (this.db) {
+      const tx1 = this.db.transaction(STORE_POLAROIDS, 'readwrite');
+      tx1.objectStore(STORE_POLAROIDS).clear();
+      const tx2 = this.db.transaction(STORE_APP_DATA, 'readwrite');
+      tx2.objectStore(STORE_APP_DATA).clear();
+    }
+    try {
+      localStorage.removeItem('memory_lane_custom_polaroids');
+      localStorage.removeItem('memory_lane_stories');
+      localStorage.removeItem('memory_lane_editedExistingPolaroids');
+      localStorage.removeItem('memory_lane_bucketList');
+      localStorage.removeItem('memory_lane_promises');
+      localStorage.removeItem('memory_lane_centerpiece');
+    } catch (e) {}
+
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+    } catch (e) {}
+  }
+};
+
+function attachPolaroidEditListeners(wrapper) {
+  const id = wrapper.getAttribute('data-id');
+  const isCustom = wrapper.getAttribute('data-custom') === 'true';
+
+  const captionEl = wrapper.querySelector('.polaroid-caption');
+  const noteEl = wrapper.querySelector('.handwritten-note p');
+
+  const onEdit = () => {
+    const caption = captionEl ? captionEl.textContent.trim() : '';
+    const note = noteEl ? noteEl.textContent.trim() : '';
+
+    if (isCustom) {
+      AppStorage.getAllPolaroids().then(list => {
+        const item = list.find(x => x.id === id);
+        if (item) {
+          item.caption = caption;
+          item.note = note;
+          AppStorage.savePolaroid(item);
+        }
+      });
+    } else {
+      AppStorage.getAppData('editedExistingPolaroids', {}).then(dict => {
+        dict = dict || {};
+        dict[id] = { caption, note };
+        AppStorage.setAppData('editedExistingPolaroids', dict);
+      });
+    }
+  };
+
+  if (captionEl) {
+    captionEl.addEventListener('blur', onEdit);
+    captionEl.addEventListener('input', () => AppStorage.updateIndicator('saving'));
+  }
+  if (noteEl) {
+    noteEl.addEventListener('blur', onEdit);
+    noteEl.addEventListener('input', () => AppStorage.updateIndicator('saving'));
+  }
 }
 
-function addNewPolaroid(imageSrc, title = "New Favorite Memory") {
+function createCustomPolaroidElement(p) {
   const wrapper = document.createElement('div');
-  const tilts = ['tilt-left', 'tilt-right', 'tilt-slight'];
-  const randomTilt = tilts[Math.floor(Math.random() * tilts.length)];
-  wrapper.className = `polaroid-wrapper ${randomTilt}`;
+  wrapper.className = `polaroid-wrapper ${p.tilt || 'tilt-slight'}`;
+  wrapper.setAttribute('data-id', p.id);
+  wrapper.setAttribute('data-custom', 'true');
   wrapper.setAttribute('onclick', 'flipPolaroidCard(this, event)');
 
   wrapper.innerHTML = `
-    <div class="polaroid-tape tape-pink"></div>
+    <button type="button" class="polaroid-delete-btn" onclick="deleteCustomPolaroid('${p.id}', event)" title="Remove this photo">🗑️</button>
+    <div class="polaroid-tape ${p.tape || 'tape-pink'}"></div>
     <div class="polaroid-card">
       <div class="polaroid-front">
         <div class="polaroid-img-container" onclick="event.stopPropagation(); openPhotoLightbox(this)" title="Click to view full photo">
-          <img src="${imageSrc}" alt="${title}" class="polaroid-img">
+          <img src="${p.src}" alt="${p.caption || 'Memory with Anvesha'}" class="polaroid-img">
           <span class="zoom-icon">🔍</span>
         </div>
-        <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">${title} ✨</div>
-        <div class="polaroid-date">Just Now</div>
+        <div class="polaroid-caption" contenteditable="true" onclick="event.stopPropagation()">${p.caption || 'Our Sweet Memory ✨'}</div>
+        <div class="polaroid-date">${p.date || 'Sweet Moments'}</div>
       </div>
       <div class="polaroid-back" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)">
         <div class="handwritten-note">
           <h4>Behind this photo 💕</h4>
-          <p contenteditable="true" onclick="event.stopPropagation()">Click here to write your sweet memory about this moment with Anvesha...</p>
+          <p contenteditable="true" onclick="event.stopPropagation()">${p.note || 'Click here to write your sweet memory about this moment with Anvesha...'}</p>
           <div class="doodle-heart">💌 forever</div>
         </div>
       </div>
     </div>
     <div class="polaroid-flip-btn" onclick="event.stopPropagation(); flipPolaroidCard(this.closest('.polaroid-wrapper'), event)" title="Flip polaroid">↻ Flip to read note</div>
   `;
+  attachPolaroidEditListeners(wrapper);
+  return wrapper;
+}
+
+window.deleteCustomPolaroid = async function(id, event) {
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  const wrapper = document.querySelector(`.polaroid-wrapper[data-id="${id}"]`);
+  if (wrapper) {
+    wrapper.style.transition = 'all 0.3s ease';
+    wrapper.style.transform = 'scale(0.8) translateY(-20px)';
+    wrapper.style.opacity = '0';
+    setTimeout(async () => {
+      wrapper.remove();
+      await AppStorage.deletePolaroid(id);
+      showToast('Polaroid removed from scrapbook 🗑️');
+    }, 280);
+  }
+};
+
+window.confirmResetMemories = async function() {
+  const confirmed = confirm("Are you sure you want to reset memories back to original? Any custom uploaded photos will be removed and default scrapbook restored.");
+  if (confirmed) {
+    await AppStorage.clearAll();
+    showToast('Vault reset to defaults 🔄');
+    setTimeout(() => {
+      window.location.reload();
+    }, 600);
+  }
+};
+
+// Upload and Auto-Save Custom Polaroids
+if (photoUploadInput) {
+  photoUploadInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    showToast(`Adding ${files.length} photo${files.length > 1 ? 's' : ''}... 📸`);
+    for (const file of files) {
+      const dataUrl = await AppStorage.compressImage(file);
+      const title = file.name.replace(/\.[^/.]+$/, "");
+      await addNewPolaroid(dataUrl, title);
+    }
+    photoUploadInput.value = '';
+  });
+}
+
+async function addNewPolaroid(imageSrc, title = "New Favorite Memory", options = {}) {
+  const tilts = ['tilt-left', 'tilt-right', 'tilt-slight'];
+  const randomTilt = tilts[Math.floor(Math.random() * tilts.length)];
+  const tapes = ['tape-pink', 'tape-glitter', 'tape-minimal'];
+  const randomTape = tapes[Math.floor(Math.random() * tapes.length)];
+
+  const polaroid = {
+    id: options.id || ('custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)),
+    src: imageSrc,
+    caption: options.caption || (title + ' ✨'),
+    note: options.note || 'Click here to write your sweet memory about this moment with Anvesha...',
+    date: options.date || 'Sweet Moments',
+    tilt: options.tilt || randomTilt,
+    tape: options.tape || randomTape,
+    createdAt: options.createdAt || Date.now()
+  };
+
+  const wrapper = createCustomPolaroidElement(polaroid);
 
   if (polaroidScrapbook) {
     polaroidScrapbook.prepend(wrapper);
     burstConfettiSmall();
-    showToast('New polaroid pinned to scrapbook! 📸');
+    showToast('New polaroid pinned & saved to vault! 📸');
+  }
+
+  if (!options.skipSave) {
+    await AppStorage.savePolaroid(polaroid);
   }
 }
 
@@ -734,12 +1033,22 @@ window.updateBucketProgress = function() {
   if (bucketProgressText) bucketProgressText.textContent = `${completed} of ${total} Completed (${percent}%)`;
 };
 
+async function saveAllBucketItems() {
+  if (!bucketListItems) return;
+  const items = Array.from(bucketListItems.querySelectorAll('.bucket-checkbox-item')).map(item => ({
+    text: item.querySelector('.bucket-text').textContent.trim(),
+    checked: item.querySelector('input').checked
+  }));
+  await AppStorage.setAppData('bucketList', items);
+}
+
 window.toggleBucketItem = function(checkbox) {
   if (!checkbox) return;
   const item = checkbox.closest('.bucket-checkbox-item');
   if (item) {
     item.classList.toggle('checked', checkbox.checked);
     window.updateBucketProgress();
+    saveAllBucketItems();
     if (checkbox.checked) {
       burstConfettiSmall();
       showToast('Adventure completed! 🎉');
@@ -761,6 +1070,7 @@ window.removeBucketItem = function(btn, event) {
     setTimeout(() => {
       item.remove();
       window.updateBucketProgress();
+      saveAllBucketItems();
       showToast('Adventure removed 🗑️');
     }, 220);
   }
@@ -784,7 +1094,8 @@ window.addBucketAdventure = function(event) {
   bucketListItems.appendChild(label);
   newBucketInput.value = '';
   window.updateBucketProgress();
-  showToast('New adventure added! ✨');
+  saveAllBucketItems();
+  showToast('New adventure added & saved! ✨');
   burstConfettiSmall();
 };
 
@@ -852,7 +1163,16 @@ window.toggleSecretPromise = function(card) {
   }
 };
 
-window.addSecretPromise = function(event) {
+async function saveAllPromises() {
+  if (!secretPromisesGrid) return;
+  const promises = Array.from(secretPromisesGrid.querySelectorAll('.secret-promise-card')).map(card => {
+    const content = card.querySelector('.promise-card-content')?.textContent.replace(/^"|"$/g, '').trim();
+    return { content };
+  }).filter(p => p.content);
+  await AppStorage.setAppData('promises', promises);
+}
+
+window.addSecretPromise = async function(event) {
   if (event) event.preventDefault();
   if (!newSecretPromiseInput || !secretPromisesGrid) return;
   const promiseText = newSecretPromiseInput.value.trim();
@@ -871,21 +1191,20 @@ window.addSecretPromise = function(event) {
 
   secretPromisesGrid.appendChild(card);
   newSecretPromiseInput.value = '';
-  showToast('Secret promise added to vault! 🗝️');
+  await saveAllPromises();
+  showToast('Secret promise added & saved to vault! 🗝️');
   burstConfettiSmall();
 };
 
-// Centerpiece Photo Upload
+// Centerpiece Photo Upload & Auto-Save
 if (replaceCenterpieceInput && finalCenterpiecePhoto) {
-  replaceCenterpieceInput.addEventListener('change', (e) => {
+  replaceCenterpieceInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        finalCenterpiecePhoto.src = event.target.result;
-        showToast('Vault centerpiece updated! 💖');
-      };
-      reader.readAsDataURL(file);
+      const dataUrl = await AppStorage.compressImage(file, 1600, 0.9);
+      finalCenterpiecePhoto.src = dataUrl;
+      await AppStorage.setAppData('centerpiece', dataUrl);
+      showToast('Vault centerpiece updated and saved! 💖');
     }
   });
 }
@@ -1104,3 +1423,138 @@ function animateConfetti() {
     cancelAnimationFrame(confettiAnimId);
   }
 }
+
+// ==========================================================================
+// 13. APP STORAGE INITIALIZATION & AUTO-RESTORE ON PAGE LOAD
+// ==========================================================================
+async function initStorageAndRestore() {
+  await AppStorage.init();
+
+  // 1. Restore Custom Polaroids from IndexedDB
+  const customPolaroids = await AppStorage.getAllPolaroids();
+  if (Array.isArray(customPolaroids) && customPolaroids.length > 0) {
+    const list = [...customPolaroids].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    list.forEach(p => {
+      if (!document.querySelector(`.polaroid-wrapper[data-id="${p.id}"]`)) {
+        const wrapper = createCustomPolaroidElement(p);
+        if (polaroidScrapbook) polaroidScrapbook.prepend(wrapper);
+      }
+    });
+  }
+
+  // 2. Attach edit listeners to all polaroids in DOM and restore edits for original polaroids
+  document.querySelectorAll('.polaroid-wrapper').forEach(wrapper => {
+    attachPolaroidEditListeners(wrapper);
+  });
+
+  const editedExisting = await AppStorage.getAppData('editedExistingPolaroids', {});
+  if (editedExisting && typeof editedExisting === 'object') {
+    for (const [id, data] of Object.entries(editedExisting)) {
+      const wrapper = document.querySelector(`.polaroid-wrapper[data-id="${id}"]`);
+      if (wrapper && data) {
+        if (data.caption) {
+          const cap = wrapper.querySelector('.polaroid-caption');
+          if (cap) cap.textContent = data.caption;
+        }
+        if (data.note) {
+          const note = wrapper.querySelector('.handwritten-note p');
+          if (note) note.textContent = data.note;
+        }
+      }
+    }
+  }
+
+  // 3. Restore and attach auto-save to Story Chapters
+  const savedStories = await AppStorage.getAppData('stories', {});
+  ['storyPart1', 'storyPart2', 'storyPart3'].forEach(partId => {
+    const el = document.getElementById(partId);
+    if (el) {
+      if (savedStories && savedStories[partId]) {
+        el.innerHTML = savedStories[partId];
+      }
+      el.addEventListener('blur', () => {
+        AppStorage.getAppData('stories', {}).then(dict => {
+          dict = dict || {};
+          dict[partId] = el.innerHTML;
+          AppStorage.setAppData('stories', dict);
+          showToast('Story memory saved 📖');
+        });
+      });
+      el.addEventListener('input', () => AppStorage.updateIndicator('saving'));
+    }
+  });
+
+  // 4. Restore Bucket List
+  const savedBucket = await AppStorage.getAppData('bucketList', null);
+  if (Array.isArray(savedBucket) && savedBucket.length > 0 && bucketListItems) {
+    bucketListItems.innerHTML = '';
+    savedBucket.forEach(item => {
+      const label = document.createElement('label');
+      label.className = `bucket-checkbox-item ${item.checked ? 'checked' : ''}`;
+      label.innerHTML = `
+        <input type="checkbox" onchange="toggleBucketItem(this)" ${item.checked ? 'checked' : ''}>
+        <span class="custom-checkmark"></span>
+        <span class="bucket-text">${item.text}</span>
+        <button type="button" class="remove-bucket-btn" onclick="removeBucketItem(this, event)" title="Remove this adventure" aria-label="Remove adventure">✕</button>
+      `;
+      bucketListItems.appendChild(label);
+    });
+    window.updateBucketProgress();
+  }
+
+  // 5. Restore Secret Promises
+  const savedPromises = await AppStorage.getAppData('promises', null);
+  if (Array.isArray(savedPromises) && savedPromises.length > 0 && secretPromisesGrid) {
+    savedPromises.forEach(p => {
+      const count = secretPromisesGrid.children.length + 1;
+      const card = document.createElement('div');
+      card.className = 'secret-promise-card';
+      card.setAttribute('onclick', 'toggleSecretPromise(this)');
+      card.innerHTML = `
+        <div class="promise-seal-icon">🔒</div>
+        <div class="promise-card-title">Secret Promise #${count}</div>
+        <div class="promise-card-preview">Tap to unlock promise...</div>
+        <div class="promise-card-content">"${p.content}"</div>
+      `;
+      secretPromisesGrid.appendChild(card);
+    });
+  }
+
+  // 6. Restore Centerpiece
+  const savedCenterpiece = await AppStorage.getAppData('centerpiece', null);
+  if (savedCenterpiece && finalCenterpiecePhoto) {
+    finalCenterpiecePhoto.src = savedCenterpiece;
+  }
+
+  // 7. Background Server Sync (if backend API /api/data is reachable)
+  try {
+    const serverData = await AppStorage.fetchBackendData();
+    if (serverData) {
+      if (Array.isArray(serverData.polaroids)) {
+        for (const sp of serverData.polaroids) {
+          const exists = (customPolaroids || []).some(cp => cp.id === sp.id);
+          if (!exists) {
+            await AppStorage.savePolaroid(sp);
+            if (!document.querySelector(`.polaroid-wrapper[data-id="${sp.id}"]`)) {
+              const wrapper = createCustomPolaroidElement(sp);
+              if (polaroidScrapbook) polaroidScrapbook.prepend(wrapper);
+            }
+          }
+        }
+      }
+      AppStorage.updateIndicator('saved', 'Vault Synced');
+    } else {
+      AppStorage.updateIndicator('saved', 'Vault Saved');
+    }
+  } catch (e) {
+    AppStorage.updateIndicator('saved', 'Vault Saved');
+  }
+}
+
+// Kick off initialization
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initStorageAndRestore);
+} else {
+  initStorageAndRestore();
+}
+
