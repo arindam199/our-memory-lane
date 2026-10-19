@@ -191,6 +191,13 @@ const musicPlaylist = [
     title: 'Romantic Melody 3 🌙',
     desc: 'Late Night Whispers',
     icon: '🧸'
+  },
+  {
+    type: 'audio',
+    src: 'assets/audio/track4.mp3',
+    title: 'Humraah (Malang) — Sachet Tandon 💖',
+    desc: 'Hamraah ab se mera tu, Hamraah main bhi tera hoon',
+    icon: '🎸'
   }
 ];
 

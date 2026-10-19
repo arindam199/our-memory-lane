@@ -82,11 +82,18 @@ const puppeteer = require('puppeteer');
   statusText = await page.$eval('#musicStatus', el => el.textContent.trim());
   console.log('Next Track (Track 4 - MP3):', { trackName, statusText });
 
-  // 5. Prev track back to Track 3
+  // 5. Next track to Track 5 (Humraah)
+  await page.click('#nextTrackBtn');
+  await new Promise(r => setTimeout(r, 1000));
+  trackName = await page.$eval('#musicTrackName', el => el.textContent.trim());
+  statusText = await page.$eval('#musicStatus', el => el.textContent.trim());
+  console.log('Next Track (Track 5 - Humraah):', { trackName, statusText });
+
+  // 6. Prev track back to Track 4
   await page.click('#prevTrackBtn');
   await new Promise(r => setTimeout(r, 1000));
   trackName = await page.$eval('#musicTrackName', el => el.textContent.trim());
-  console.log('Prev Track (Back to Track 3):', { trackName });
+  console.log('Prev Track (Back to Track 4):', { trackName });
 
   // 6. Pause via Hero Button
   const heroBtnText = await page.$eval('#playMusicHeroBtn', el => el.textContent.trim());
